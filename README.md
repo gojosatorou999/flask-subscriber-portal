@@ -1,4 +1,4 @@
-# Email Subscription Manager
+# Flask Subscriber Portal
 
 A modern, subscription management system built with Flask and SQLite. This project allows users to subscribe and unsubscribe from an email list, with a clean and interactive UI.
 
@@ -33,7 +33,7 @@ A modern, subscription management system built with Flask and SQLite. This proje
 ### Running the Application
 1.  Navigate to the project directory:
     ```bash
-    cd "c:/Users/Admin/Documents/timepass/12"
+    cd flask-subscriber-portal
     ```
 2.  Install dependencies:
     ```bash
