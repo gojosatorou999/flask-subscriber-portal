@@ -208,6 +208,44 @@
             justify-content: center;
             z-index: 100;
         }
+
+        .stats-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stats-badge span {
+            color: var(--success);
+        }
+
+        .validation-hint {
+            font-size: 0.75rem;
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .validation-hint.visible {
+            opacity: 1;
+        }
+
+        .validation-hint.valid { color: var(--success); }
+        .validation-hint.invalid { color: var(--error); }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -216,13 +254,21 @@
     <button class="theme-toggle" id="theme-toggle" title="Toggle Theme">
         <i data-lucide="moon"></i>
     </button>
+    <div class="stats-badge" id="stats-badge">
+        <i data-lucide="users"></i>
+        <span><span id="subscriber-count">0</span> Active Subscribers</span>
+    </div>
     <div class="container">
         <h1>Stay Connected</h1>
         <p class="subtitle">Enter your email to manage your subscription</p>
 
         <div class="form-group">
             <label for="email">Email Address</label>
-            <input type="email" id="email" placeholder="example@gmail.com" required>
+            <input type="email" id="email" placeholder="example@gmail.com" required oninput="validateEmail(this.value)">
+            <div id="validation-hint" class="validation-hint">
+                <i data-lucide="info" style="width: 14px; height: 14px;"></i>
+                <span id="validation-text">Invalid email format</span>
+            </div>
         </div>
 
         <div class="btn-group">
@@ -264,6 +310,7 @@
 
                 if (response.ok) {
                     showStatus(data.message, "success");
+                    updateStats();
                     if (action === 'subscribe') {
                         confetti({
                             particleCount: 100,
@@ -289,6 +336,33 @@
             statusDiv.style.display = 'block';
         }
 
+        // Real-time Validation
+        function validateEmail(email) {
+            const hint = document.getElementById('validation-hint');
+            const text = document.getElementById('validation-text');
+            const regex = /[^@]+@[^@]+\.[^@]+/;
+            
+            if (!email) {
+                hint.className = 'validation-hint';
+                return;
+            }
+
+            const isValid = regex.test(email);
+            hint.className = `validation-hint visible ${isValid ? 'valid' : 'invalid'}`;
+            text.textContent = isValid ? 'Format looks good!' : 'Invalid email format';
+            hint.querySelector('i').setAttribute('data-lucide', isValid ? 'check-circle' : 'alert-circle');
+            lucide.createIcons();
+        }
+
+        // Stats Logic
+        async function updateStats() {
+            try {
+                const res = await fetch('/api/stats');
+                const data = await res.json();
+                document.getElementById('subscriber-count').textContent = data.count || 0;
+            } catch (e) { console.error(e); }
+        }
+
         // Theme Toggle Logic
         const themeToggle = document.getElementById('theme-toggle');
         const icon = themeToggle.querySelector('i');
@@ -300,6 +374,8 @@
             lucide.createIcons();
         });
 
+        // Initialize
+        updateStats();
         lucide.createIcons();
     </script>
 </body>

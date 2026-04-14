@@ -85,5 +85,17 @@ def notify():
     except Exception as e:
         return jsonify({"message": str(e)}), 500
 
+@app.route('/api/stats')
+def stats():
+    try:
+        conn = sqlite3.connect('subscribers.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM subscribers")
+        count = cursor.fetchone()[0]
+        conn.close()
+        return jsonify({"count": count})
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
