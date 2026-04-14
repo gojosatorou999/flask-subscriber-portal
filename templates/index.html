@@ -19,6 +19,13 @@
             --glass: rgba(255, 255, 255, 0.05);
         }
 
+        [data-theme="light"] {
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-secondary: #64748b;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
@@ -183,9 +190,32 @@
         button:active {
             transform: scale(0.98);
         }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
+    <button class="theme-toggle" id="theme-toggle" title="Toggle Theme">
+        <i data-lucide="moon"></i>
+    </button>
     <div class="container">
         <h1>Stay Connected</h1>
         <p class="subtitle">Enter your email to manage your subscription</p>
@@ -234,6 +264,13 @@
 
                 if (response.ok) {
                     showStatus(data.message, "success");
+                    if (action === 'subscribe') {
+                        confetti({
+                            particleCount: 100,
+                            spread: 70,
+                            origin: { y: 0.6 }
+                        });
+                    }
                     if (action === 'notify') {
                         console.log("Recipients:", data.recipients);
                     }
@@ -251,6 +288,19 @@
             statusDiv.className = `status ${type}`;
             statusDiv.style.display = 'block';
         }
+
+        // Theme Toggle Logic
+        const themeToggle = document.getElementById('theme-toggle');
+        const icon = themeToggle.querySelector('i');
+
+        themeToggle.addEventListener('click', () => {
+            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            document.documentElement.setAttribute('data-theme', isLight ? 'dark' : 'light');
+            icon.setAttribute('data-lucide', isLight ? 'moon' : 'sun');
+            lucide.createIcons();
+        });
+
+        lucide.createIcons();
     </script>
 </body>
 </html>
